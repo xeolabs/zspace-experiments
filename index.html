@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+<h1>ZSpace Experiments</h1>
+
+<p>These experiments render a minimal WebGL scene for a ZSpace viewer.</p>
+
+<p>Find the source code at <a href="https://github.com/xeolabs/zspace-experiments">https://github.com/xeolabs/zspace-experiments</a>.</p>
+
+<p>Currently I'm having a problem with Experiment 2, where the view and projection matrices are not correct. I'm making
+    that assumption because Experiment 2 confirms that left and right views are rendering to the stereo framebuffer.</p>
+
+<h2>Experiment 1</h2>
+
+<ul>
+    <li>Tests the minimal WebGL renderer without a ZSpace viewer, using WebGL 1.</li>
+    <li>You should see a triangle, viewed from an eye position that pans back and forth along the X-axis.</li>
+    <li>Working: <b>yes</b></li>
+    <li><a href="https://github.com/xeolabs/zspace-experiments/blob/master/exp1.html">Source</a></li>
+    <li><a href="http://xeolabs.com/zspace-experiments/exp1.html">Run</a></li>
+</ul>
+
+<h2>Experiment 2</h2>
+
+<ul>
+    <li>Tests the minimal WebGL renderer with a ZSpace viewer, using WebGL 2, while relying on ZSpace to provide the
+        stereo view and projection matrices.
+    </li>
+    <li>You should see a triangle that moves correctly with respect to the headset/glasses, instead there is a black
+        canvas.
+    </li>
+    <li>Working: <b>no</b></li>
+    <li><a href="https://github.com/xeolabs/zspace-experiments/blob/master/exp2.html">Source</a></li>
+    <li><a href="http://xeolabs.com/zspace-experiments/exp2.html">Run</a></li>
+</ul>
+
+<h2>Experiment 3</h2>
+
+<ul>
+    <li>Tests the minimal WebGL renderer with a ZSpace viewer, using WebGL 2, while "manually" creating approximated
+        stereo view and projection matrices, independently of ZSpace.
+    </li>
+    <li>You should see a triangle, viewed from an eye position that pans back and forth along the X-axis, without being
+        affected by movement of the headset/glasses.
+    </li>
+    <li>Working: <b>yes</b></li>
+    <li><a href="https://github.com/xeolabs/zspace-experiments/blob/master/exp3.html">Source</a></li>
+    <li><a href="http://xeolabs.com/zspace-experiments/exp3.html">Run</a></li>
+</ul>
+
+</body>
+</html>

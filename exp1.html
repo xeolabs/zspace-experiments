@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Hello WebGL</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <script src="js/gl-matrix-min.js"></script>
+    <script src="js/renderer.js"></script>
+</head>
+<body>
+
+<h1>Exp 1</h1>
+<p>Tests the Renderer utility on WebGL 1 without ZSpace. You should see a triangle from an eye position that pans back and forth on the X-axis.</p>
+
+<canvas id="myCanvas" width="600px" height="600px"></canvas>
+
+<script>
+    
+    var canvas = document.getElementById("myCanvas");
+    var gl;
+    try {
+        gl = canvas.getContext("webgl", {alpha: true});
+        gl.clearColor(0.1, 0.2, 0.3, 1.0);
+        gl.enable(gl.DEPTH_TEST);
+        gl.disable(gl.CULL_FACE);
+    } catch (e) {
+    }
+    if (!gl) {
+        alert("Bogus! No WebGL.");
+    }
+
+    var renderer = new Renderer(canvas, gl);
+
+    var pos = 0;
+
+    function render() {
+
+        pos += 0.1;
+
+        if (pos > 3) {
+            pos = -3;
+        }
+
+        var eye = [0.0 + pos, 0.0, -3.0];
+        var center = [0.0, 0.0, 0.0];
+        var up = [0.0, 1.0, 0.0];
+
+        var viewMat = mat4.create();
+        mat4.lookAt(viewMat, eye, center, up);
+
+        var projMat = mat4.create();
+        mat4.perspective(projMat, 45, 1.0, 0.1, 5000);
+
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.enable(gl.DEPTH_TEST);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        renderer.draw(viewMat, projMat);
+
+        requestAnimationFrame(render);
+    }
+
+    requestAnimationFrame(render);
+
+</script>
+</body>
+</html>

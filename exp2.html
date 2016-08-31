@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Hello WebGL</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <script src="js/gl-matrix-min.js"></script>
+    <script src="js/zSpace.js"></script>
+    <script src="js/renderer.js"></script>
+</head>
+<body>
+
+<h1>Exp 2</h1>
+<p>Rendering stereo view using ZSpace, while relying on ZSpace to provide the view and projection matrices for each eye.</p>
+
+<canvas id="myCanvas" width="600px" height="600px"></canvas>
+
+<script>
+
+    var canvas = document.getElementById("myCanvas");
+    var gl;
+    try {
+        gl = canvas.getContext("webgl2", {alpha: true});
+        gl.clearColor(0.1, 0.2, 0.3, 1.0);
+        gl.enable(gl.DEPTH_TEST);
+        gl.enable(gl.CULL_FACE);
+    } catch (e) {
+    }
+    if (!gl) {
+        alert("Bogus! No WebGL 2.");
+    }
+
+    var renderer = new Renderer(canvas, gl);
+
+    var zspace = new ZSpace(gl, canvas, window);
+
+    zspace.zspaceInit();
+    zspace.setCanvasOffset(0, 0);
+    zspace.setViewerScale(1);
+    zspace.setFarClip(5000.0);
+
+    function render() {
+
+        var eye = [0.0, 0.0, -3.0];
+        var center = [0.0, 0.0, 0.0];
+        var up = [0.0, 1.0, 0.0];
+
+        var cameraMat = mat4.create();
+        mat4.lookAt(cameraMat, eye, center, up);
+        var viewMat = mat4.create();
+
+        // Update zSpace information
+        zspace.zspaceUpdate();
+
+        // This forces an update from the compositor
+        gl.clear(gl.COLOR_BUFFER_BIT| gl.DEPTH_BUFFER_BIT);
+
+        // Render the left eye
+
+        zspace.zspaceLeftView();
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.enable(gl.DEPTH_TEST);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        mat4.multiply(viewMat, zspace.leftViewMatrix, cameraMat);
+        renderer.draw(viewMat, zspace.leftProjectionMatrix);
+
+        // Render the right eye
+
+        zspace.zspaceRightView();
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.enable(gl.DEPTH_TEST);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        mat4.multiply(viewMat, zspace.rightViewMatrix, cameraMat);
+        renderer.draw(viewMat, zspace.rightProjectionMatrix);
+
+        // Notify the end of frame
+        zspace.zspaceFrameEnd();
+
+        requestAnimationFrame(render);
+    }
+
+    requestAnimationFrame(render);
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Hello WebGL</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <script src="js/gl-matrix-min.js"></script>
+    <script src="js/zSpace.js"></script>
+    <script src="js/renderer.js"></script>
+</head>
+<body>
+
+<h1>Exp 3</h1>
+
+<p>Rendering stereo view using ZSpace, but creating the view and projection matrices manually. Note that these matrices are just a rough approximation - they are not supposed to be correct with respect to eye positions.</p>
+
+
+<canvas id="myCanvas" width="600px" height="600px"></canvas>
+
+<script>
+
+    var canvas = document.getElementById("myCanvas");
+    var gl;
+    try {
+        gl = canvas.getContext("webgl2", {alpha: true});
+        gl.clearColor(0.1, 0.2, 0.3, 1.0);
+        gl.enable(gl.DEPTH_TEST);
+        gl.disable(gl.CULL_FACE);
+    } catch (e) {
+    }
+    if (!gl) {
+        alert("Bogus! No WebGL 2.");
+    }
+
+    var renderer = new Renderer(canvas, gl);
+
+    var zspace = new ZSpace(gl, canvas, window);
+
+    zspace.zspaceInit();
+    zspace.setCanvasOffset(0, 0);
+    zspace.setViewerScale(1);
+    zspace.setFarClip(5000.0);
+
+    function render() {
+
+        var leftEye = [0.0 - 2, 0.0, -4.0];
+        var rightEye = [0.0 + 2, 0.0, -4.0];
+        var center = [0.0, 0.0, 0.0];
+        var up = [0.0, 1.0, 0.0];
+
+        // Update zSpace information
+        zspace.zspaceUpdate();
+
+        // This forces an update from the compositor
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        // Render the left eye
+
+        var viewMat = mat4.create();
+        mat4.lookAt(viewMat, leftEye, center, up);
+        var projMat = mat4.create();
+        mat4.perspective(projMat, 45, 1.0, 0.1, 5000);
+
+        zspace.zspaceLeftView();
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.enable(gl.DEPTH_TEST);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        renderer.draw(viewMat, projMat);
+
+        // Render the right eye
+
+        zspace.zspaceRightView();
+
+        viewMat = mat4.create();
+        mat4.lookAt(viewMat, rightEye, center, up);
+        projMat = mat4.create();
+        mat4.perspective(projMat, 45, 1.0, 0.1, 5000);
+
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.enable(gl.DEPTH_TEST);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        renderer.draw(viewMat, projMat);
+
+        // Notify the end of frame
+        zspace.zspaceFrameEnd();
+
+        requestAnimationFrame(render);
+    }
+
+    requestAnimationFrame(render);
+
+</script>
+</body>
+</html>

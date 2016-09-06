@@ -37,12 +37,13 @@
 
     zspace.zspaceInit();
     zspace.setCanvasOffset(0, 0);
-    zspace.setViewerScale(1);
+    zspace.setViewerScale(10);
     zspace.setFarClip(5000.0);
 
     function render() {
 
-        var eye = [0.0, 0.0, -3.0];
+        //var eye = [0.0, 0.0, 3.0];
+        var eye = [0.0, 3.45, 2.22];
         var center = [0.0, 0.0, 0.0];
         var up = [0.0, 1.0, 0.0];
 
